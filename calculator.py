@@ -101,6 +101,21 @@ def calculate():
                 operator_symbol ="-"
         #mul
         
+        #div
+        elif choice == 'div':
+        if num2 == 0:
+              print("Error: Division by zero is not allowed.")
+              continue
+        result = num1 / num2
+        operator_symbol = "/"
+
+
+        expression = f"{num1} {operator_symbol} {num2}"
+        print(f"Result: {result}")
+        
+        append_to_history(expression, result)
+        print("Recorded to history.")
+
       
 
 if __name__ == "__main__":
