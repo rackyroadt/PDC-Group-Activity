@@ -92,18 +92,16 @@ def calculate():
         
         #add
         if choice == 'add':
+            result = num1 + num2
+            operator_symbol = '+'
            
         #sub
-      
+        elif choice == 'sub':
+                result = num1 - num2 
+                operator_symbol ="-"
         #mul
-        elif choice == 'mul':
-                
         
-        on = f"{num1} {operator_symbol} {num2}"
-        print(f"Result: {result}")
-        
-        append_to_history(expression, result)
-        print("Recorded to history.")
+      
 
 if __name__ == "__main__":
     calculate()
