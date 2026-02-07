@@ -36,8 +36,8 @@ def main():
         except ValueError:
             print("Error: Please enter a valid positive number.")
 
-    grades = []
-    units = []
+grades = []
+units = []
 
 # Subject Data
 
@@ -72,3 +72,26 @@ for i in range(n):
                     print(f"Error: Units for '{name}' must be between 1 and 4.")
             except ValueError:
                 print("Error: Make sure units are integers.")
+
+        task = GWATask(grades, units)
+    start = time.perf_counter()
+
+    with ThreadPoolExecutor() as executor:
+        for i in range(len(grades)):
+            executor.submit(task.compute, i)
+
+    if task.total_units == 0:
+        print("\nError: Total units cannot be zero.")
+        return
+
+    gwa = task.weighted_sum / task.total_units
+    end = time.perf_counter()
+
+    # Results display
+    print("\n" + "=" * 50)
+    print(f"Final GWA: {gwa:.3f}")
+    print(f"Computed in {end - start:.6f} seconds (Multithreaded)")
+    print("=" * 50)
+
+if name == "main":
+    main()
