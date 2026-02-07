@@ -12,4 +12,4 @@
 
 5. Which method is better for CPU-bound tasks and which for I/O-bound tasks?
 
-6. How did your group apply creative coding or algorithmic solutions in this lab?
+6. How did your group apply creative coding or algorithmic solutions in this glab?
