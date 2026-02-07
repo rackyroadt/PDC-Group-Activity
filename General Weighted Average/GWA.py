@@ -15,3 +15,26 @@ class GWATask:
         with self.lock:
             self.weighted_sum += product
             self.total_units += self.units[index]
+def main():
+    print("=" * 50)
+    print("      Grade Weighted Average - CLI Edition      ")
+    print("         Centralized Computing System           ")
+    print("=" * 50)
+
+    # Get number of subjects
+    while True:
+        try:
+            num_input = input("\nEnter number of subjects: ").strip()
+            n = int(num_input)
+            if n <= 0:
+                print("Error: Please enter a valid positive number of subjects.")
+                continue
+            if n > 8:
+                print("Warning: A maximum of 8 subjects is allowed for this layout.")
+                n = 8
+            break
+        except ValueError:
+            print("Error: Please enter a valid positive number.")
+
+    grades = []
+    units = []
