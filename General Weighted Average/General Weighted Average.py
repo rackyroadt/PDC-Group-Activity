@@ -1,38 +1,5 @@
 import threading
 import time
-
-grades = [1.25, 1.50, 2.00, 1.75, 1.25]
-units  = [3, 3, 4, 3, 2]
-
-weighted_sum = 0
-total_units = 0
-lock = threading.Lock()
-
-def compute(index):
-    global weighted_sum, total_units
-    with lock:
-        weighted_sum += grades[index] * units[index]
-        total_units += units[index]
-
-start = time.time()
-
-threads = []
-for i in range(len(grades)):
-    t = threading.Thread(target=compute, args=(i,))
-    threads.append(t)
-    t.start()
-
-for t in threads:
-    t.join()
-
-gwa = weighted_sum / total_units
-end = time.time()
-
-print("Multithreading GWA:", gwa)
-print("Execution Time:", end - start)
-
-import threading
-import time
 from multiprocessing import Process, Queue
 
 thread_results = []
@@ -46,7 +13,7 @@ def compute_gwa_thread(subject_name, grade, thread_id):
             'grade': grade,
             'id': thread_id
         })
-        print("[Thread {}] {}: {}".format(thread_id, subject_name, grade))
+        print(f"[Thread {thread_id}] {subject_name}: {grade}")
 
 def run_multithreading(subjects, grades):
     global thread_results
@@ -83,7 +50,7 @@ def compute_gwa_process(subject_name, grade, process_id, result_queue):
         'grade': grade,
         'id': process_id
     })
-    print("[Process {}] {}: {}".format(process_id, subject_name, grade))
+    print(f"[Process {process_id}] {subject_name}: {grade}")
 
 def run_multiprocessing(subjects, grades):
     result_queue = Queue()
@@ -103,15 +70,17 @@ def run_multiprocessing(subjects, grades):
         processes.append(p)
         p.start()
     
+    # Collect results from queue before join to avoid potential deadlocks if queue is full
+    # though for small data it's usually fine.
+    process_results = []
+    for _ in range(len(subjects)):
+        process_results.append(result_queue.get())
+        
     for p in processes:
         p.join()
     
     end_time = time.time()
     execution_time = end_time - start_time
-    
-    process_results = []
-    while not result_queue.empty():
-        process_results.append(result_queue.get())
     
     gwa = sum(grades) / len(grades) if grades else 0
     
@@ -123,33 +92,51 @@ def main():
     print(" Multithreading vs Multiprocessing Comparison")
     print("=" * 70)
     
-    num_subjects = int(input("\nEnter number of subjects: "))
+    while True:
+        try:
+            num_subjects = int(input("\nEnter number of subjects: "))
+            if num_subjects < 0:
+                print("Please enter a positive number.")
+                continue
+            break
+        except ValueError:
+            print("Invalid input. Please enter a number.")
     
     subjects = []
     grades = []
     
     print("\nEnter subject names and grades:")
     for i in range(num_subjects):
-        subject = input("Subject {} name: ".format(i+1))
-        grade = float(input("Grade for {}: ".format(subject)))
+        while True:
+            subject = input(f"Subject {i+1} name: ").strip()
+            if subject:
+                break
+            print("Subject name cannot be empty. Please enter a valid name.")
+            
+        while True:
+            try:
+                grade = float(input(f"Grade for {subject}: "))
+                break
+            except ValueError:
+                print("Invalid input. Please enter a numerical grade.")
         subjects.append(subject)
         grades.append(grade)
     
-    print("\n[TEST 1] MULTITHREADING")
+    print(f"\n[TEST 1] MULTITHREADING")
     thread_time, thread_gwa, thread_res = run_multithreading(subjects, grades)
-    print("Completed in {:.6f} seconds".format(thread_time))
+    print(f"Completed in {thread_time:.6f} seconds")
     
-    print("\n[TEST 2] MULTIPROCESSING")
+    print(f"\n[TEST 2] MULTIPROCESSING")
     process_time, process_gwa, process_res = run_multiprocessing(subjects, grades)
-    print("Completed in {:.6f} seconds".format(process_time))
+    print(f"Completed in {process_time:.6f} seconds")
     
     print("\n" + "=" * 70)
     print("PERFORMANCE COMPARISON TABLE")
     print("=" * 70)
-    print("{:<20} {:<20} {:<15} {}".format('Method', 'Execution Time', 'GWA', 'Status'))
+    print(f"{'Method':<20} {'Execution Time':<20} {'GWA':<15} {'Status'}")
     print("-" * 70)
-    print("{:<20} {:<20} {:<15.2f} {}".format('Multithreading', '{:.6f} seconds'.format(thread_time), thread_gwa, 'Complete'))
-    print("{:<20} {:<20} {:<15.2f} {}".format('Multiprocessing', '{:.6f} seconds'.format(process_time), process_gwa, 'Complete'))
+    print(f"{'Multithreading':<20} {f'{thread_time:.6f} seconds':<20} {thread_gwa:<15.2f} {'Complete'}")
+    print(f"{'Multiprocessing':<20} {f'{process_time:.6f} seconds':<20} {process_gwa:<15.2f} {'Complete'}")
     print("=" * 70)
     
     print("\nANALYSIS:")
@@ -164,10 +151,10 @@ def main():
         diff = thread_time - process_time
         percent = ((thread_time - process_time) / thread_time) * 100
     
-    print("Faster method: {}".format(faster))
-    print("Time difference: {:.6f} seconds ({:.2f}% faster)".format(diff, percent))
-    print("Number of subjects processed: {}".format(num_subjects))
-    print("Both methods calculated GWA: {:.2f}".format(thread_gwa))
+    print(f"Faster method: {faster}")
+    print(f"Time difference: {diff:.6f} seconds ({percent:.2f}% faster)")
+    print(f"Number of subjects processed: {num_subjects}")
+    print(f"Both methods calculated GWA: {thread_gwa:.2f}")
     
     print("\nNOTES:")
     print("Execution order may vary between runs due to concurrent execution")
@@ -176,5 +163,5 @@ def main():
     print("For I/O-bound or lightweight tasks, multithreading is more efficient")
     print("=" * 70)
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     main()
