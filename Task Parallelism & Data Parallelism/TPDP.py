@@ -35,7 +35,7 @@ def compute_withholding_tax(salary):
     print(f"[{thread_name}] Withholding Tax: {tax:.2f}")
     return tax
 
-    # PART B 
+# PART B
 def compute_payroll(employee):
     """
     Computes complete payroll for one employee.
