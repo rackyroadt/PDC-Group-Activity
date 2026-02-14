@@ -78,3 +78,35 @@ def compute_payroll(employee):
         "net_salary": net_salary,
         "process_id": os.getpid()
     } 
+
+def data_parallelism_example(employees):
+    print("\n===== PART B: Data Parallelism (ProcessPoolExecutor) =====")
+
+    with ProcessPoolExecutor() as executor:
+        results = executor.map(compute_payroll, employees)
+
+        for result in results:
+            print(f"\nEmployee: {result['name']}")
+            print(f"Process ID: {result['process_id']}")
+            print(f"Gross Salary: {result['gross_salary']:.2f}")
+            print(f"Total Deduction: {result['total_deduction']:.2f}")
+            print(f"Net Salary: {result['net_salary']:.2f}")
+
+    print("===============================================")
+
+if __name__ == "__main__":
+
+    # Part A: Single employee salary
+    employee_salary = 50000
+    task_parallelism_example(employee_salary)
+
+    # Part B: Multiple employees
+    employee_list = [
+        ("Alice", 50000),
+        ("Bob", 45000),
+        ("Charlie", 60000),
+        ("Diana", 55000),
+        ("Edward", 48000),
+    ]
+
+    data_parallelism_example(employee_list)
