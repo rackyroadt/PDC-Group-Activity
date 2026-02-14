@@ -6,6 +6,8 @@ from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 # PART A — TASK PARALLELISM
 # ==============================
 
+
+
 # --- Individual Deduction Functions ---
 
 def compute_sss(salary):
@@ -28,6 +30,24 @@ def compute_pagibig(salary):
     print(f"[{thread_name}] Pag-IBIG Deduction: {pagibig:.2f}")
     return pagibig
 
+def task_parallelism_example(salary):
+    print("\n===== PART A: Task Parallelism (ThreadPoolExecutor) =====")
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        future_sss = executor.submit(compute_sss, salary)
+        future_philhealth = executor.submit(compute_philhealth, salary)
+        future_pagibig = executor.submit(compute_pagibig, salary)
+        future_tax = executor.submit(compute_withholding_tax, salary)
+
+        sss = future_sss.result()
+        philhealth = future_philhealth.result()
+        pagibig = future_pagibig.result()
+        tax = future_tax.result()
+
+    total_deduction = sss + philhealth + pagibig + tax
+
+    print(f"\nTotal Deduction: {total_deduction:.2f}")
+    print("===============================================") 
 
 def compute_withholding_tax(salary):
     thread_name = threading.current_thread().name
