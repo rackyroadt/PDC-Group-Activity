@@ -34,3 +34,21 @@ def compute_withholding_tax(salary):
     tax = salary * 0.10
     print(f"[{thread_name}] Withholding Tax: {tax:.2f}")
     return tax
+
+
+# PART B TASK 
+
+def data_parallelism_example(employees):
+    print("\n===== PART B: Data Parallelism (ProcessPoolExecutor) =====")
+
+    with ProcessPoolExecutor() as executor:
+        results = executor.map(compute_payroll, employees)
+
+        for result in results:
+            print(f"\nEmployee: {result['name']}")
+            print(f"Process ID: {result['process_id']}")
+            print(f"Gross Salary: {result['gross_salary']:.2f}")
+            print(f"Total Deduction: {result['total_deduction']:.2f}")
+            print(f"Net Salary: {result['net_salary']:.2f}")
+
+    print("===============================================")
