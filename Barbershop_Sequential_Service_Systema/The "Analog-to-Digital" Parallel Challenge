@@ -30,3 +30,72 @@ def do_stage(stage_name):
     time.sleep(base * jitter)
 
 SENTINEL = None
+
+#Sequential
+def sequential_barbershop():
+    print("\n" + "="*55)
+    print("  SEQUENTIAL MODE")
+    print("="*55)
+    start = time.perf_counter()
+    for cid in range(1, NUM_CUSTOMERS + 1):
+        log(f"  [Barber] Customer {cid:02d} - starting...")
+        for stage in STAGE_DURATIONS:
+            do_stage(stage)
+        log(f"  [Barber] Customer {cid:02d} - done.")
+    elapsed = time.perf_counter() - start
+    print(f"\n  Sequential time: {elapsed:.4f} s")
+    return elapsed
+
+#Workers
+def worker_1(in_q, out_q):
+    while True:
+        customer = in_q.get()
+        if customer is SENTINEL:
+            out_q.put(SENTINEL)
+            break
+        cid = customer["id"]
+        log(f"  [W1 - Consultation] Customer {cid:02d} - consulting...")
+        do_stage("Consultation")
+        log(f"  [W1 - Consultation] Customer {cid:02d} - done.")
+        out_q.put(customer)
+
+def worker_2(in_q, out_q):
+    while True:
+        customer = in_q.get()
+        if customer is SENTINEL:
+            out_q.put(SENTINEL)
+            break
+        cid = customer["id"]
+        log(f"  [W2 - Washing]      Customer {cid:02d} - washing...")
+        do_stage("Washing")
+        log(f"  [W2 - Washing]      Customer {cid:02d} - done.")
+        out_q.put(customer)
+
+def worker_3(in_q, out_q):
+    while True:
+        customer = in_q.get()
+        if customer is SENTINEL:
+            out_q.put(SENTINEL)
+            break
+        cid = customer["id"]
+        log(f"  [W3 - Cutting]      Customer {cid:02d} - waiting for chair...")
+        barber_chair_lock.acquire()
+        log(f"  [W3 - Cutting]      Customer {cid:02d} - cutting... [LOCKED]")
+        do_stage("Cutting")
+        barber_chair_lock.release()
+        log(f"  [W3 - Cutting]      Customer {cid:02d} - done. [UNLOCKED]")
+        out_q.put(customer)
+
+def worker_4(in_q):
+    global done_count
+    while True:
+        customer = in_q.get()
+        if customer is SENTINEL:
+            break
+        cid = customer["id"]
+        log(f"  [W4 - Styling]      Customer {cid:02d} - styling & checkout...")
+        do_stage("Styling")
+        do_stage("Checkout")
+        with done_lock:
+            done_count += 1
+            log(f"  [W4 - Styling]      Customer {cid:02d} - COMPLETE [{done_count}/{NUM_CUSTOMERS}]")
