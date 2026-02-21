@@ -137,5 +137,15 @@ def parallel_barbershop():
     print(f"\n  Parallel time: {elapsed:.4f} s")
     return elapsed
 
+#Main
+if __name__ == "__main__":
+    seq_time = sequential_barbershop()
+    par_time = parallel_barbershop()
 
+    speedup = seq_time / par_time
+    print("\n" + "="*55)
+    print(f"  Sequential time : {seq_time:.4f} s")
+    print(f"  Parallel time   : {par_time:.4f} s")
+    print(f"  Speedup         : {speedup:.2f}x")
+    print("="*55)
 
