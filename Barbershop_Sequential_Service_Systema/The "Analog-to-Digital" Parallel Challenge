@@ -99,3 +99,41 @@ def worker_4(in_q):
         with done_lock:
             done_count += 1
             log(f"  [W4 - Styling]      Customer {cid:02d} - COMPLETE [{done_count}/{NUM_CUSTOMERS}]")
+
+#Parallel
+def parallel_barbershop():
+    global done_count
+    done_count = 0
+
+    print("\n" + "="*55)
+    print("  PARALLEL MODE — 4-Stage Pipeline (Task Parallelism)")
+    print("="*55)
+
+    input_q = queue.Queue()
+    q1      = queue.Queue()
+    q2      = queue.Queue()
+    q3      = queue.Queue()
+
+    threads = [
+        threading.Thread(target=worker_1, args=(input_q, q1)),
+        threading.Thread(target=worker_2, args=(q1, q2)),
+        threading.Thread(target=worker_3, args=(q2, q3)),
+        threading.Thread(target=worker_4, args=(q3,)),
+    ]
+
+    start = time.perf_counter()
+
+    for t in threads:
+        t.start()
+
+    for cid in range(1, NUM_CUSTOMERS + 1):
+        input_q.put({"id": cid})
+    input_q.put(SENTINEL)
+
+    for t in threads:
+        t.join()
+
+    elapsed = time.perf_counter() - start
+    print(f"\n  Parallel time: {elapsed:.4f} s")
+    return elapsed
+
