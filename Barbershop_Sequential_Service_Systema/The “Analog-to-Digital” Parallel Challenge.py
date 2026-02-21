@@ -99,3 +99,6 @@ def worker_4(in_q):
         with done_lock:
             done_count += 1
             log(f"  [W4 - Styling]      Customer {cid:02d} - COMPLETE [{done_count}/{NUM_CUSTOMERS}]")
+
+            log(f"  [W4 - Styling]      Customer {cid:02d} - COMPLETE [{done_count}/{NUM_CUSTOMERS}]
+
